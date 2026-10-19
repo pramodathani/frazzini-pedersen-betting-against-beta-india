@@ -12,17 +12,11 @@ class IndexDownloader:
 
     Attributes:
         endpoint: The niftyindices.com address that serves the history.
-        index_names: The index names the site expects, keyed by file stem.
     """
 
     endpoint = (
         'https://www.niftyindices.com/BackPage/getTotalReturnIndexString'
     )
-    index_names = {
-        'nifty500_tri': 'Nifty 500',
-        'nifty100_lowvol30_tri': 'NIFTY100 LOW VOLATILITY 30',
-        'nifty_lowvol50_tri': 'NIFTY LOW VOLATILITY 50',
-    }
 
     def __init__(self, output_folder: pathlib.Path) -> None:
         """Stores where files are saved.
@@ -37,6 +31,11 @@ class IndexDownloader:
             None.
         """
         self.output_folder = output_folder
+        self.index_names = {
+            'nifty500_tri': 'Nifty 500',
+            'nifty100_lowvol30_tri': 'NIFTY100 LOW VOLATILITY 30',
+            'nifty_lowvol50_tri': 'NIFTY LOW VOLATILITY 50',
+        }
 
     def fetch(self, index_name: str, start: str, end: str) -> list[dict]:
         """Asks the site for one index's daily history.
