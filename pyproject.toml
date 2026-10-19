@@ -44,6 +44,9 @@ dependencies = [
     "statsmodels>=0.14",
 ]
 
+[project.scripts]
+bab-india-app = "frazzini_pedersen_india.site_server:SiteServerApplication.launch"
+
 [project.optional-dependencies]
 live = [
     "tradingmachine @ git+https://github.com/pramodathani/tradingmachine.git",

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Betting Against Beta in India</title>
+<meta name="description" content="An interactive companion to a replication of Frazzini and Pedersen (2014), Betting Against Beta, on NSE shares from 2008 to 2026: beta-sorted portfolios, the BAB factor, robustness checks and long-only low-beta portfolios after Indian trading costs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tinos:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+</head>
+<body>
+<main>
+
+<header class="paper-head">
+  <h1>Betting Against Beta in India: Low-Beta Shares on the National Stock Exchange, 2008–2026</h1>
+  <p class="authors">Pramod Athani</p>
+  <p class="contact"><a href="mailto:pramod.athani@gmail.com">pramod.athani@gmail.com</a> · ORCID <a href="https://orcid.org/0009-0002-0270-7045">0009-0002-0270-7045</a> · SSRN <a href="https://papers.ssrn.com/sol3/cf_dev/AbsByAuth.cfm?per_id=13497529">13497529</a> · <a href="https://www.linkedin.com/in/pramod-athani-b65b922a/">LinkedIn</a></p>
+  <p class="affiliation">An interactive companion to a replication of Frazzini and Pedersen (2014) · <a href="https://github.com/pramodathani/frazzini-pedersen-betting-against-beta-india">code on GitHub</a></p>
+  <p class="dateline">Holding months <span id="first-month">…</span> to <span id="last-month">…</span> · snapshot built <span id="generated">…</span></p>
+</header>
+
+<section class="abstract">
+  <h2>Abstract</h2>
+  <p>We rebuild the beta-sorted portfolios and the betting-against-beta (BAB) factor of Frazzini and Pedersen (2014) on shares traded on India's National Stock Exchange, from February 2008 to September 2026, with returns adjusted for splits, bonuses and dividends and with delisted shares included. As in the paper, high-beta shares earn lower risk-adjusted returns: among the 500 most traded shares the CAPM alpha falls from <span id="abstract-alpha-low">…</span> a month for the lowest-beta decile to <span id="abstract-alpha-high">…</span> for the highest. The rank-weighted BAB factor over all shares earns <span id="abstract-bab-full">…</span> a month before costs (Newey–West t = <span id="abstract-bab-full-t">…</span>), close to the paper's 0.70%, but only <span id="abstract-bab-liquid">…</span> (t = <span id="abstract-bab-liquid-t">…</span>) over the 500 most traded shares, and about half of the all-share result comes from the least traded half of shares. Shares cannot be shorted overnight in India's cash market, so we also hold the lowest-beta decile alone: after Indian costs it returned <span id="abstract-long-only">…</span> a year against <span id="abstract-benchmark">…</span> for the NIFTY 500 with dividends, with a beta of 0.70, but the excess is not statistically significant.</p>
+  <p class="keywords"><b>Keywords:</b> betting against beta, low beta, leverage constraints, India, NSE, replication. <b>JEL:</b> G11, G12, G14.</p>
+</section>
+
+<div class="citation-box">
+  <div class="label">Suggested citation</div>
+  <p id="citation-text">Athani, P. (2026). <i>Betting Against Beta in India: Low-Beta Shares on the National Stock Exchange, 2008–2026</i> (Version 0.1) [Interactive paper and software]. https://pramodathani.github.io/frazzini-pedersen-betting-against-beta-india/</p>
+  <button class="button" id="copy-citation">Copy</button>
+</div>
+
+<div class="specification" id="specification">
+  <div class="label">Specification</div>
+  <div class="controls">
+    <label>Universe
+      <select id="control-universe">
+        <option value="liquid">500 most traded shares</option>
+        <option value="full">all shares with a beta</option>
+      </select>
+    </label>
+    <label>Trading costs
+      <select id="control-costs">
+        <option value="gross">before costs</option>
+        <option value="net">after costs</option>
+      </select>
+    </label>
+  </div>
+  <div class="summary" id="specification-summary">Loading data…</div>
+</div>
+
+<h2 class="section">1. Introduction</h2>
+<p>Frazzini and Pedersen (2014) argue that investors who cannot borrow tilt towards high-beta shares to get more return, which bids those shares up and leaves them with lower risk-adjusted returns than the CAPM predicts. A factor that is long leveraged low-beta shares and short high-beta shares, scaled so that it has zero beta, should then earn a positive return. They find that it does in US stocks from 1926 to 2012, with a Sharpe ratio of 0.78, and in 19 other developed markets, Treasuries, credit and futures. India does not appear in their paper.</p>
+<p>This companion applies their construction to Indian shares. The controls above choose the universe and whether Indian trading costs are deducted; every table and figure in Sections 3 to 5 responds to them. All returns are monthly and in excess of the risk-free rate unless stated, and every <i>t</i>-statistic uses Newey–West standard errors.</p>
+
+<h2 class="section">2. Data and method</h2>
+<p>We use NSE's daily price files from 1995 to October 2026, which hold every share while it traded, including shares later delisted, with returns adjusted for splits, bonuses and dividends from NSE's corporate action list, which is complete from 2005. Funds, exchange traded funds and rights entitlements are removed, and a share that is renamed is linked to its earlier history by its ISIN code. The market is the NIFTY 500 total-return index and the risk-free rate is the RBI 91-day Treasury bill yield.</p>
+<p>Following the paper, the beta of a share is the correlation of its overlapping three-day log returns with the market over five years, times the ratio of its one-year volatility to the market's, shrunk towards one with a weight of 0.6. Betas need at least 750 daily observations, so the first portfolio forms in January 2008. At each month-end shares are sorted on beta, and the portfolio is held for the next month. Deciles use cut points set by the 500 most traded shares, which plays the role of the paper's NYSE breakpoints. The BAB factor weights each half of the shares by the rank of its beta, scales each half to a beta of one, and goes long the low-beta half and short the high-beta half.</p>
+<p>All backtests use the brahmagupta engine with NSE delivery costs: securities transaction tax, stamp duty, exchange and SEBI charges and GST, plus an assumed market impact of 0.10% a side for the 500 most traded shares and 0.30% for all shares. Because the short side cannot be held overnight in Indian cash shares, and no borrowing fee is charged, the BAB factor is a research portfolio, not an investable one.</p>
+
+<h2 class="section">3. Beta-sorted portfolios</h2>
+<div class="table-wrap">
+  <table id="table-deciles"></table>
+</div>
+<figure>
+  <div class="chart short" id="figure-alpha"></div>
+  <figcaption><b>Figure 1.</b> CAPM alpha by beta decile, monthly percent, with the NIFTY 500 as the market. A flat security market line shows as alphas that fall as beta rises.</figcaption>
+</figure>
+<figure>
+  <div class="chart short" id="figure-beta"></div>
+  <figcaption><b>Figure 2.</b> Realised beta by decile, from a regression of the decile's excess return on the NIFTY 500's.</figcaption>
+</figure>
+<p id="text-deciles"></p>
+
+<h2 class="section">4. The BAB factor</h2>
+<div class="table-wrap">
+  <table id="table-bab"></table>
+</div>
+<figure>
+  <div class="chart" id="figure-bab"></div>
+  <figcaption><b>Figure 3.</b> Growth of ₹1 invested in the rank-weighted BAB factor, and in the NIFTY 500 in excess of the risk-free rate, on a logarithmic scale.</figcaption>
+</figure>
+<p id="text-bab"></p>
+
+<h2 class="section">5. Where the premium comes from</h2>
+<div class="table-wrap">
+  <table id="table-legs"></table>
+</div>
+<p>The low-beta leg carries the premium: its 4-factor alpha is far above the high-beta leg's, as in the paper's Table B1 (0.36% against −0.01%).</p>
+<div class="table-wrap">
+  <table id="table-size"></table>
+</div>
+<div class="table-wrap">
+  <table id="table-ivol"></table>
+</div>
+<p>Before costs the premium is largest in the two least traded groups and weaker in the others, which fits the finding that dropping the least traded half of shares cuts the all-share BAB by half (Table 7).</p>
+
+<h2 class="section">6. Stability and robustness</h2>
+<div class="table-wrap">
+  <table id="table-subperiods"></table>
+</div>
+<div class="table-wrap scroll">
+  <table id="table-variants"></table>
+</div>
+<p id="text-variants"></p>
+
+<h2 class="section">7. A long-only low-beta portfolio</h2>
+<p>An Indian investor can hold the lowest-beta decile but cannot short the highest. The figure and table compare that portfolio, formed from the 500 most traded shares, with the NIFTY 500 and with NSE's own low-volatility indices.</p>
+<figure>
+  <div class="chart tall" id="figure-wealth"></div>
+  <figcaption><b>Figure 4.</b> Growth of ₹1, total returns after costs, on a logarithmic scale.</figcaption>
+</figure>
+<figure>
+  <div class="chart short" id="figure-drawdown"></div>
+  <figcaption><b>Figure 5.</b> Drawdown, the percentage below the previous peak.</figcaption>
+</figure>
+<div class="table-wrap">
+  <table id="table-long-only"></table>
+</div>
+<p class="table-note">The 12-month hold is the best of 17 specifications tried; treat it with suspicion.</p>
+
+<h2 class="section">8. Limits</h2>
+<p>The Indian sample has 224 monthly returns against about 1,000 in the paper's US sample, so a Sharpe ratio of 0.78 would give a <i>t</i>-statistic near 3.4 here instead of 7. We tried 17 specifications; the main one was fixed before any result was seen, and with a Bonferroni correction for 17 tests only the all-share BAB before costs clears the 5% bar. There is no market capitalisation before 2024, so traded value stands in for size and for value weights. There is no Indian liquidity factor, factor alphas cover 215 months because the IIMA factors end in December 2025, and the paper's funding-liquidity tests (TED spread) are not replicated. NSE's files do not say what holders received when a share was delisted, so the study tests losses of 30% and 100% at delisting. An adversarial review of the code and the data found no look-ahead or coding errors, and its fixes are in the repository.</p>
+
+<h2 class="section">Declarations</h2>
+<p><b>Conflicts of interest.</b> The author may hold positions in securities mentioned. Nothing here is investment advice, and past results do not predict future returns.</p>
+<p><b>Data and code availability.</b> The code and the derived results are at <a href="https://github.com/pramodathani/frazzini-pedersen-betting-against-beta-india">github.com/pramodathani/frazzini-pedersen-betting-against-beta-india</a>. NSE's raw files are not redistributed; the repository lists where each was fetched.</p>
+<p><b>Funding.</b> None.</p>
+
+<h2 class="section">References</h2>
+<ol class="references">
+  <li>Agarwalla, S. K., Jacob, J., Varma, J. R., and Vasudevan, E. (2014). Betting against beta in the Indian market. IIM Ahmedabad Working Paper 2014-07-01.</li>
+  <li>Frazzini, A., and Pedersen, L. H. (2014). Betting against beta. <i>Journal of Financial Economics</i>, 111(1), 1–25. <a href="https://doi.org/10.1016/j.jfineco.2013.10.005">doi:10.1016/j.jfineco.2013.10.005</a></li>
+  <li>Novy-Marx, R., and Velikov, M. (2022). Betting against betting against beta. <i>Journal of Financial Economics</i>, 143(1), 80–106.</li>
+  <li>Vasicek, O. A. (1973). A note on using cross-sectional information in Bayesian estimation of security betas. <i>Journal of Finance</i>, 28(5), 1233–1239.</li>
+</ol>
+
+<p class="footnote">The paper read is the authors' manuscript of 10 May 2013, not the typeset journal article, so page references differ from the journal's. Daily and monthly results are derived from NSE data; no raw exchange data is published here.</p>
+
+</main>
+<script src="app.js"></script>
+</body>
+</html>
