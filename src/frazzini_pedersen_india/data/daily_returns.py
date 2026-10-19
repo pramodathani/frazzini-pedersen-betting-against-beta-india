@@ -20,8 +20,9 @@ class DailyReturnBuilder:
         """Computes each share's return from one session to its next.
 
         On the first session on or after an ex-date the return is
-        (close x price factor + dividend) / previous close - 1, where the
-        previous close is the share's own last close in the data.
+        (close + dividend) / (previous close x price factor) - 1, where the
+        previous close is the share's own last close in the data and the
+        price factor is the multiplier old prices take to the new basis.
 
         Args:
             prices: A table with columns date, symbol and close.
@@ -45,8 +46,9 @@ class DailyReturnBuilder:
         grouped = frame.groupby('symbol')
         frame['previous_close'] = grouped['close'].shift(1)
         frame['previous_date'] = grouped['date'].shift(1)
-        adjusted = frame['close'] * frame['price_factor'] + frame['dividend']
-        frame['return'] = adjusted / frame['previous_close'] - 1.0
+        total = frame['close'] + frame['dividend']
+        adjusted_previous = frame['previous_close'] * frame['price_factor']
+        frame['return'] = total / adjusted_previous - 1.0
         frame['gap_days'] = (frame['date'] - frame['previous_date']).dt.days
         frame = frame.dropna(subset=['return'])
         invalid = (frame['return'] <= self.lowest_return) | (

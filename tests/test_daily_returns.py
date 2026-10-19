@@ -88,7 +88,8 @@ class TestDailyReturnBuilder:
         """
         prices = self.make_prices([100.0, 50.0, 51.0])
         actions = self.make_actions('2020-01-02', 0.5, 0.0)
-        returns, _ = DailyReturnBuilder().build(prices, actions)
+        returns, errors = DailyReturnBuilder().build(prices, actions)
+        assert len(errors) == 0
         assert returns['return'].iloc[0] == pytest.approx(0.0)
         assert returns['return'].iloc[1] == pytest.approx(0.02)
 
@@ -106,7 +107,8 @@ class TestDailyReturnBuilder:
         """
         prices = self.make_prices([100.0, 98.0])
         actions = self.make_actions('2020-01-02', 1.0, 3.0)
-        returns, _ = DailyReturnBuilder().build(prices, actions)
+        returns, errors = DailyReturnBuilder().build(prices, actions)
+        assert len(errors) == 0
         assert returns['return'].iloc[0] == pytest.approx(0.01)
 
     def test_action_on_holiday_moves_to_next_session(self) -> None:
@@ -121,10 +123,11 @@ class TestDailyReturnBuilder:
         Raises:
             AssertionError: If the split is not applied on Monday.
         """
-        prices = self.make_prices([100.0, 100.0, 20.0, 20.0])
+        prices = self.make_prices([100.0, 100.0, 100.0, 20.0])
         actions = self.make_actions('2020-01-04', 0.2, 0.0)
-        returns, _ = DailyReturnBuilder().build(prices, actions)
-        assert returns['return'].iloc[1] == pytest.approx(0.0)
+        returns, errors = DailyReturnBuilder().build(prices, actions)
+        assert len(errors) == 0
+        assert returns['return'].iloc[2] == pytest.approx(0.0)
 
     def test_missed_split_is_zeroed_and_logged(self) -> None:
         """An unexplained 80 percent fall is set to zero and recorded.
