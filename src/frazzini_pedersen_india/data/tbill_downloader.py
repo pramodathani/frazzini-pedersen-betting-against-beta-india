@@ -21,7 +21,7 @@ class TreasuryBillDownloader:
         'https://www.rbi.org.in/scripts/BS_PressReleaseDisplay.aspx?prid={}'
     )
     pattern = re.compile(
-        r'Cut-off price \(.\) / Yield\s+[\d.]+\s+[\d.]+\s+[\d.]+\s+'
+        r'Cut-off price[^Y]*Yield\s+[\d.]+\s+[\d.]+\s+[\d.]+\s+'
         r'\(YTM: ([\d.]+)%\)'
     )
     date_pattern = re.compile(r'Date : ([A-Za-z]{3} \d+, \d{4})')
@@ -88,7 +88,7 @@ class TreasuryBillDownloader:
             if kind == 'auction':
                 rows.append([release_number, date_text, yield_percent])
                 print(rows[-1], flush=True)
-                release_number -= 30
+                release_number -= 50
             else:
                 release_number -= 1
             time.sleep(0.2)
