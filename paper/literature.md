@@ -6,14 +6,14 @@ Gathered by the literature_scout subagent on 2026-10-19. Many publisher pages bl
 
 | Paper | What it says | Status |
 |---|---|---|
-| Novy-Marx and Velikov (2022), Betting against betting against beta, JFE 143(1), 80-106, https://ideas.repec.org/a/eee/jfinec/v143y2022i1p80-106.html | BAB's performance is driven by its non-standard construction, above all rank weighting, which overweights small, illiquid stocks; a conventional construction earns much less. | Snippet only |
+| Novy-Marx and Velikov (2022), Betting against betting against beta, JFE 143(1), 80-106, https://ideas.repec.org/a/eee/jfinec/v143y2022i1p80-106.html | The authors' preprint snippet says that the paper's first non-standard procedure, rank weighting, "drives BAB's performance". The rest of the argument has not been read. | Snippet only |
 | Cederburg and O'Doherty (2016), Does it pay to bet against beta?, JF 71(2), 737-774 | A conditional CAPM with instrumented market risk resolves the beta anomaly. | Abstract snippet |
 | Alquist, Frazzini, Ilmanen and Pedersen (2020), Fact and fiction about low-risk investing, SSRN 3539452 | Defends the low-risk effect against the main critiques. | Snippet |
 | Bali, Brown, Murray and Tang (2017), A lottery-demand-based explanation of the beta anomaly, JFQA 52(6), 2369-2397 | Lottery demand (MAX, factor FMAX) as an explanation. Whether it removes the BAB alpha is unconfirmed. | Unverified |
 | Asness, Frazzini, Gormsen and Pedersen (2020), Betting against correlation, JFE 135(3), 629-652 | Splits beta into volatility and correlation; the BAC factor separates leverage-constraint theories from behavioural ones. | Abstract |
 | Schneider, Wagner and Zechner (2020), Low-risk anomalies?, JF 75(5), 2673-2718 | Low-risk anomalies may be compensation for coskewness risk. | Unverified |
 | Liu, Stambaugh and Yuan (2018), Absolving beta of volatility's effects, JFE 128(1), 1-15 | The beta anomaly is attributed to idiosyncratic volatility. | Title only, unverified |
-| Hong and Sraer (2016), Speculative betas, JF 71(5), 2095-2144 | Disagreement plus short-sale constraints make high-beta stocks overpriced. | Unverified |
+| Hong and Sraer (2016), Speculative betas, JF 71(5), 2095-2144 | A model of why high-beta stocks are overpriced; the mechanism was not read. | Unverified |
 | Hou, Xue and Zhang (2020), Replicating anomalies, RFS 33(5); Jensen, Kelly and Pedersen (2023), Is there a replication crisis in finance?, JF 78, 2465-2518 | Both cite the paper; their treatment of BAB was not checked. | Unverified |
 
 ## Indian evidence
