@@ -115,3 +115,94 @@ class PortfolioBuilder:
             ZeroDivisionError: If a leg's beta is zero.
         """
         return low / low_beta - high / high_beta
+
+    def value_weighted_bab(
+        self,
+        betas: pd.Series,
+        values: pd.Series,
+        breakpoint_shares: pd.Series,
+    ) -> pd.Series:
+        """Builds the two-by-three value-weighted BAB of paper Table B9.
+
+        Shares are split at the median traded value of the breakpoint shares
+        into small and large, and within each size group into low beta (below
+        the 30th percentile of the breakpoint shares' betas), middle and high
+        beta (above the 70th percentile). Legs are weighted by traded value,
+        averaged over the two size groups, and divided by their betas.
+
+        Args:
+            betas: Ex-ante betas of the eligible shares.
+            values: Median traded value of the same shares.
+            breakpoint_shares: Flags for the shares that set the cut points.
+
+        Returns:
+            Weights of low / low beta minus high / high beta on excess
+            returns.
+
+        Raises:
+            ValueError: If no breakpoint share is eligible or a group is
+                empty.
+        """
+        flags = breakpoint_shares.reindex(betas.index).fillna(False)
+        flags = flags.astype(bool)
+        if not flags.any():
+            raise ValueError('no breakpoint shares among eligible shares')
+        size_cut = values[flags].median()
+        low_cut = betas[flags].quantile(0.3)
+        high_cut = betas[flags].quantile(0.7)
+        low_total = pd.Series(0.0, index=betas.index)
+        high_total = pd.Series(0.0, index=betas.index)
+        low_beta = 0.0
+        high_beta = 0.0
+        for large in (False, True):
+            if large:
+                in_size = values > size_cut
+            else:
+                in_size = values <= size_cut
+            low_members = in_size & (betas <= low_cut)
+            high_members = in_size & (betas >= high_cut)
+            if not low_members.any() or not high_members.any():
+                raise ValueError('a size group has an empty leg')
+            low_weights = values.where(low_members, 0.0)
+            high_weights = values.where(high_members, 0.0)
+            low_weights = low_weights / low_weights.sum()
+            high_weights = high_weights / high_weights.sum()
+            low_total = low_total + 0.5 * low_weights
+            high_total = high_total + 0.5 * high_weights
+            low_beta = low_beta + 0.5 * float((betas * low_weights).sum())
+            high_beta = high_beta + 0.5 * float((betas * high_weights).sum())
+        return low_total / low_beta - high_total / high_beta
+
+    def equal_weighted_bab(
+        self,
+        betas: pd.Series,
+        breakpoint_shares: pd.Series,
+    ) -> pd.Series:
+        """Builds a BAB with equal weights in each half instead of ranks.
+
+        Args:
+            betas: Ex-ante betas of the eligible shares.
+            breakpoint_shares: Flags for the shares that set the median.
+
+        Returns:
+            Weights of low / low beta minus high / high beta on excess
+            returns, each half equally weighted.
+
+        Raises:
+            ValueError: If no breakpoint share is eligible or a half is
+                empty.
+        """
+        flags = breakpoint_shares.reindex(betas.index).fillna(False)
+        flags = flags.astype(bool)
+        if not flags.any():
+            raise ValueError('no breakpoint shares among eligible shares')
+        cutoff = betas[flags].median()
+        low_members = betas <= cutoff
+        high_members = betas > cutoff
+        if not low_members.any() or not high_members.any():
+            raise ValueError('a half has no shares')
+        low = low_members.astype(float) / low_members.sum()
+        high = high_members.astype(float) / high_members.sum()
+        low_beta = float((betas * low).sum())
+        high_beta = float((betas * high).sum())
+        return self.bab_target(low, high, low_beta, high_beta)

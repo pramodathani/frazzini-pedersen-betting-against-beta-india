@@ -147,3 +147,43 @@ class TestPortfolioBuilder:
         low, high, _, _ = PortfolioBuilder().bab_weights(betas, flags)
         assert low.sum() == pytest.approx(1.0)
         assert high.sum() == pytest.approx(1.0)
+
+    def test_value_weighted_bab_has_zero_beta(self) -> None:
+        """The two-by-three BAB nets to zero ex-ante beta.
+
+        Args:
+            None.
+
+        Returns:
+            None.
+
+        Raises:
+            AssertionError: If the beta is not zero.
+        """
+        betas = self.make_betas(200)
+        generator = np.random.default_rng(2)
+        values = pd.Series(
+            generator.permutation(np.arange(1.0, 201.0)), index=betas.index
+        )
+        flags = pd.Series(True, index=betas.index)
+        target = PortfolioBuilder().value_weighted_bab(betas, values, flags)
+        assert (target * betas).sum() == pytest.approx(0.0, abs=1e-9)
+        assert target.clip(lower=0).sum() > 1.0
+
+    def test_equal_weighted_bab_has_zero_beta(self) -> None:
+        """The equal-weighted BAB nets to zero ex-ante beta.
+
+        Args:
+            None.
+
+        Returns:
+            None.
+
+        Raises:
+            AssertionError: If the beta is not zero or weights unequal.
+        """
+        betas = self.make_betas(10)
+        flags = pd.Series(True, index=betas.index)
+        target = PortfolioBuilder().equal_weighted_bab(betas, flags)
+        assert (target * betas).sum() == pytest.approx(0.0, abs=1e-12)
+        assert target['S0'] == pytest.approx(target['S1'])
