@@ -13,7 +13,7 @@ class ShareClassifier:
     """
 
     name_pattern = re.compile(
-        r'(BEES|ETF|IETF|-RE\d*$|^LIQUID|^GILT|^NIFTY\d|^SETF)',
+        r'(BEES|ETF|IETF|-RE\d*$|^LIQUID|^GILT|^NIFTY\d|^SETF|^FTCPO)',
         re.IGNORECASE,
     )
 

@@ -35,6 +35,7 @@ class RunMainApplication:
         betas = pd.read_parquet(derived / 'betas_month_end.parquet')
         values = pd.read_parquet(derived / 'median_traded_value.parquet')
         monthly = pd.read_parquet(derived / 'monthly_returns.parquet')
+        traded = pd.read_parquet(derived / 'traded_in_month.parquet')
         market_data = MarketData(data_folder)
         risk_free = market_data.monthly_risk_free()
         factors = market_data.factors()
@@ -44,7 +45,9 @@ class RunMainApplication:
                 '2026-09-01'
             ):
                 formation_dates.append(date)
-        schedule = WeightSchedule().build(betas, values, formation_dates)
+        schedule = WeightSchedule().build(
+            betas, values, formation_dates, traded
+        )
         excess = monthly.sub(risk_free.reindex(monthly.index), axis=0)
         first = pd.Period(formation_dates[0], 'M') + 1
         last = pd.Period(formation_dates[-1], 'M') + 1

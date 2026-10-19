@@ -9,6 +9,8 @@ from frazzini_pedersen_india.data.corporate_actions import (
     CorporateActionTable,
 )
 from frazzini_pedersen_india.data.daily_returns import DailyReturnBuilder
+from frazzini_pedersen_india.data.share_classifier import ShareClassifier
+from frazzini_pedersen_india.data.share_identity import ShareIdentity
 
 
 class BuildReturnsApplication:
@@ -33,6 +35,21 @@ class BuildReturnsApplication:
             paths.append(action_folder / f'{year}.json')
         paths.append(data_folder / 'nse/corporate_actions/2026.json')
         actions = CorporateActionTable().load(paths)
+        excluded = ShareClassifier().excluded_symbols(prices)
+        prices = prices[~prices['symbol'].isin(excluded)]
+        mapping = ShareIdentity().symbol_map(prices)
+        pd.Series(mapping).to_csv(data_folder / 'derived/symbol_map.csv')
+        prices = prices.assign(symbol=prices['symbol'].map(mapping))
+        prices = prices.sort_values('traded_value', ascending=False)
+        before = len(prices)
+        prices = prices.drop_duplicates(['date', 'symbol'])
+        print('duplicate share-days dropped', before - len(prices))
+        actions = actions.assign(symbol=actions['symbol'].map(mapping))
+        actions = actions.dropna(subset=['symbol'])
+        actions = actions.groupby(['symbol', 'ex_date'], as_index=False).agg(
+            price_factor=('price_factor', 'prod'),
+            dividend=('dividend', 'sum'),
+        )
         returns, errors = DailyReturnBuilder().build(prices, actions)
         returns = returns[returns['date'] >= '2005-01-01']
         errors = errors[errors['date'] >= '2005-01-01']

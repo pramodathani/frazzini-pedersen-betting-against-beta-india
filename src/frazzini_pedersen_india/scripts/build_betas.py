@@ -8,7 +8,6 @@ import pandas as pd
 from frazzini_pedersen_india.bab.beta_estimator import BetaEstimator
 from frazzini_pedersen_india.bab.return_panel import ReturnPanel
 from frazzini_pedersen_india.data.market_data import MarketData
-from frazzini_pedersen_india.data.share_classifier import ShareClassifier
 
 
 class BuildBetasApplication:
@@ -27,12 +26,7 @@ class BuildBetasApplication:
             FileNotFoundError: If an input file is missing.
         """
         derived = data_folder / 'derived'
-        prices = pd.read_parquet(
-            derived / 'prices_2003.parquet', columns=['symbol', 'isin']
-        )
-        excluded = ShareClassifier().excluded_symbols(prices)
         returns = pd.read_parquet(derived / 'daily_returns.parquet')
-        returns = returns[~returns['symbol'].isin(excluded)]
         counts = returns.groupby('date')['symbol'].count()
         sessions = pd.DatetimeIndex(counts[counts >= 100].index)
         panel = ReturnPanel(returns, sessions)
@@ -47,6 +41,9 @@ class BuildBetasApplication:
         panel.monthly_returns().to_parquet(derived / 'monthly_returns.parquet')
         median_value = panel.median_traded_value(month_ends)
         median_value.to_parquet(derived / 'median_traded_value.parquet')
+        panel.traded_in_month(month_ends).to_parquet(
+            derived / 'traded_in_month.parquet'
+        )
         market.to_frame('market').to_parquet(derived / 'market_daily.parquet')
         print('sessions', len(sessions), 'shares', betas.shape[1])
         print('month ends', len(month_ends))

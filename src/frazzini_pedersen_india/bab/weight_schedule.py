@@ -54,6 +54,7 @@ class WeightSchedule:
         betas: pd.DataFrame,
         median_value: pd.DataFrame,
         formation_dates: list[pd.Timestamp],
+        traded: pd.DataFrame | None = None,
     ) -> dict[str, pd.DataFrame]:
         """Builds target weights for every portfolio and holding month.
 
@@ -64,6 +65,9 @@ class WeightSchedule:
             betas: Month-end betas, dates by shares.
             median_value: Median traded values on the same dates.
             formation_dates: The month-ends at which to form portfolios.
+            traded: Optional True or False table, dates by shares, saying
+                whether the share traded in the formation month; shares that
+                did not are left out.
 
         Returns:
             A dictionary from portfolio name to a table of holding months by
@@ -77,9 +81,11 @@ class WeightSchedule:
         """
         rows = {}
         for date in formation_dates:
-            rows[date] = self.weights_at(
-                betas.loc[date].dropna(), median_value.loc[date]
-            )
+            eligible = betas.loc[date].dropna()
+            if traded is not None:
+                flags = traded.loc[date].reindex(eligible.index)
+                eligible = eligible[flags.fillna(False).astype(bool)]
+            rows[date] = self.weights_at(eligible, median_value.loc[date])
         names = list(next(iter(rows.values())).keys())
         result = {}
         for name in names:

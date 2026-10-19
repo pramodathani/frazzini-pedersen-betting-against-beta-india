@@ -95,3 +95,23 @@ class TestWeightSchedule:
         levered = result['bab_low_leg_levered'].iloc[0]
         beta = (levered * row.reindex(levered.index)).sum()
         assert beta == pytest.approx(1.0)
+
+    def test_shares_that_did_not_trade_are_left_out(self) -> None:
+        """A share flagged as not traded gets no weight.
+
+        Args:
+            None.
+
+        Returns:
+            None.
+
+        Raises:
+            AssertionError: If the share is held.
+        """
+        betas, values = self.make_inputs()
+        traded = pd.DataFrame(True, index=betas.index, columns=betas.columns)
+        traded['S0'] = False
+        schedule = WeightSchedule(liquid_count=100)
+        result = schedule.build(betas, values, list(betas.index), traded)
+        assert 'S0' not in result['full_D1'].columns
+        assert 'S0' not in result['bab_full'].columns

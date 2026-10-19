@@ -55,8 +55,9 @@ class PortfolioBuilder:
 
         Shares are ranked by beta. The split is at the rank of the breakpoint
         shares' median beta, and weights grow with the distance in rank from
-        the split (paper eq. 16, p.19). With every share a breakpoint share
-        this is exactly the paper's formula.
+        the split, each leg then scaled to add to one (paper eq. 16, p.19).
+        With every share a breakpoint share and no tied betas this is the
+        paper's formula.
 
         Args:
             betas: Ex-ante betas of the eligible shares, indexed by symbol,
@@ -80,12 +81,12 @@ class PortfolioBuilder:
         ranks = betas.rank(method='average')
         split = float((betas <= cutoff).sum()) + 0.5
         distance = ranks - split
-        total = distance.abs().sum()
-        scale = 2.0 / total
-        high = scale * distance.clip(lower=0.0)
-        low = scale * (-distance).clip(lower=0.0)
+        high = distance.clip(lower=0.0)
+        low = (-distance).clip(lower=0.0)
         if high.sum() == 0.0 or low.sum() == 0.0:
             raise ValueError('a BAB leg has no shares')
+        high = high / high.sum()
+        low = low / low.sum()
         low_beta = float((betas * low).sum())
         high_beta = float((betas * high).sum())
         return low, high, low_beta, high_beta

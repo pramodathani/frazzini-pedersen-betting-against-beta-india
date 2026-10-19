@@ -106,3 +106,26 @@ class ReturnPanel:
             block = self.traded_value.iloc[start : position + 1]
             rows.append(block.median(skipna=True))
         return pd.DataFrame(rows, index=pd.DatetimeIndex(formation_dates))
+
+    def traded_in_month(
+        self, formation_dates: list[pd.Timestamp]
+    ) -> pd.DataFrame:
+        """Says whether each share traded at all in each formation month.
+
+        Args:
+            formation_dates: Month-end sessions.
+
+        Returns:
+            A True or False table of formation dates by shares.
+
+        Raises:
+            None.
+        """
+        months = self.traded_value.index.to_period('M')
+        traded = self.traded_value.notna().groupby(months).any()
+        periods = pd.PeriodIndex(
+            [date.to_period('M') for date in formation_dates]
+        )
+        table = traded.loc[periods]
+        table.index = pd.DatetimeIndex(formation_dates)
+        return table

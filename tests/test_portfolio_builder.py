@@ -128,3 +128,22 @@ class TestPortfolioBuilder:
         assert (target * betas).sum() == pytest.approx(0.0, abs=1e-12)
         assert target.clip(lower=0).sum() == pytest.approx(1.0 / low_beta)
         assert (-target).clip(lower=0).sum() == pytest.approx(1.0 / high_beta)
+
+    def test_legs_add_to_one_when_split_is_off_the_mean_rank(self) -> None:
+        """A breakpoint set that splits unevenly still gives unit legs.
+
+        Args:
+            None.
+
+        Returns:
+            None.
+
+        Raises:
+            AssertionError: If a leg does not add to one.
+        """
+        betas = self.make_betas(11)
+        flags = pd.Series(False, index=betas.index)
+        flags.iloc[:4] = True
+        low, high, _, _ = PortfolioBuilder().bab_weights(betas, flags)
+        assert low.sum() == pytest.approx(1.0)
+        assert high.sum() == pytest.approx(1.0)
