@@ -30,7 +30,7 @@ UBI is used only to cross-check our own adjusted prices from December 2019, beca
 ## Coverage checks
 
 - NIFTY 500 TRI has 5,405 trading days from 2005-01-01. The bhavcopies cover 5,380 of them, and every bhavcopy date is also a TRI date. The 25 days with no bhavcopy are special Saturday and Sunday sessions (budget days, Muhurat and so on), for example 2025-02-01 and 2026-02-01. The Build stage merges each such day into the next session's return.
-- 26 trading days a year in the 2026 files are still to be checked against `not_available.txt` (2026-06-26, 2026-09-14 and 2026-10-02 are listed there); the Build stage compares each listed date with the index and UBI calendars.
+- None of the dates in `not_available.txt` from 2005 on is a NIFTY 500 TRI trading day, so NSE had no file only on holidays.
 
 ## Catches
 
