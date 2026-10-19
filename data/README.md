@@ -2,18 +2,18 @@
 
 Everything in this folder except this file is git-ignored. Raw exchange data is never published, only derived results. Fetched on 2026-10-19 (India time); data runs to the 2026-10-16 session.
 
-## Reused from the jt-pilot study's raw downloads (read-only)
+## Reused from the Jegadeesh and Titman study's raw downloads (read-only)
 
-Only raw downloads were read. jt-pilot's code, processed files and results were not.
+Only raw downloads were read. That study's code, processed files and results were not.
 
 | Path here | Copied or linked from | Contents | Counts |
 |---|---|---|---|
-| `external/earlier_bhavcopy_raw` (symlink) | `research/jstor/jegadeesh_and_titman/data/bhavcopy/raw`, the raw folder jt-pilot itself links to | Daily NSE share bhavcopy zips, `{year}/{date}.csv.zip`; old format to 2024-07-05, UDiFF from 2024-07-08; plus `not_available.txt` | 1995-01-02 to 2026-10-06; 242 to 252 files a year from 2005 (2026: 187); 430 dates NSE had no file for |
+| `external/earlier_bhavcopy_raw` (symlink) | `research/jstor/jegadeesh_and_titman/data/bhavcopy/raw`, the raw folder that study links to | Daily NSE share bhavcopy zips, `{year}/{date}.csv.zip`; old format to 2024-07-05, UDiFF from 2024-07-08; plus `not_available.txt` | 1995-01-02 to 2026-10-06; 242 to 252 files a year from 2005 (2026: 187); 430 dates NSE had no file for |
 | `external/earlier_corporate_actions` (symlink) | `.../data/bhavcopy/corporate_actions` | NSE corporate actions JSON per year, complete only from 2005 | 1995 to 2026-10-06; 829 actions in 2005, 1,778 in 2010, 2,208 in 2020, 1,927 in 2025 |
-| `nse/bhavcopy_raw/2026/` | jt-pilot `data/nse/bhavcopy_raw/2026`, copied | UDiFF bhavcopies for the sessions after the earlier files end | 8 files, 2026-10-07 to 2026-10-16; 2,949 EQ, BE and BZ shares on the last day |
-| `nse/corporate_actions/2026.json` | jt-pilot `data/nse/corporate_actions/2026.json`, copied | 2026 corporate actions refreshed to the last session; replaces the symlinked 2026 file | 1,849 actions, latest ex-date 2026-10-16 |
-| `nse/indices/nifty500_tri.json` | jt-pilot `data/nse/nifty500_tri.json`, copied | NIFTY 500 total return index, daily; fetched from niftyindices.com | 7,879 rows, 1995-01-01 to 2026-10-16. `NTR_Value` is filled only from 2015; we use `TotalReturnsIndex` |
-| `nse/iima/2025-12_FourFactors_and_Market_Returns_Monthly_SurvivorshipBiasAdjusted.csv` | jt-pilot `data/nse/iima/`, copied | IIMA SMB, HML, WML, MF and RF, monthly returns in percent; RF is from RBI 91-day T-bill auctions | 387 months, 1993-10 to 2025-12; no RF in 1993-10 |
+| `nse/bhavcopy_raw/2026/` | that study's `data/nse/bhavcopy_raw/2026`, copied | UDiFF bhavcopies for the sessions after the earlier files end | 8 files, 2026-10-07 to 2026-10-16; 2,949 EQ, BE and BZ shares on the last day |
+| `nse/corporate_actions/2026.json` | that study's `data/nse/corporate_actions/2026.json`, copied | 2026 corporate actions refreshed to the last session; replaces the symlinked 2026 file | 1,849 actions, latest ex-date 2026-10-16 |
+| `nse/indices/nifty500_tri.json` | that study's `data/nse/nifty500_tri.json`, copied | NIFTY 500 total return index, daily; fetched from niftyindices.com | 7,879 rows, 1995-01-01 to 2026-10-16. `NTR_Value` is filled only from 2015; we use `TotalReturnsIndex` |
+| `nse/iima/2025-12_FourFactors_and_Market_Returns_Monthly_SurvivorshipBiasAdjusted.csv` | that study's `data/nse/iima/`, copied | IIMA SMB, HML, WML, MF and RF, monthly returns in percent; RF is from RBI 91-day T-bill auctions | 387 months, 1993-10 to 2025-12; no RF in 1993-10 |
 
 ## Downloaded for this study
 
@@ -43,4 +43,4 @@ UBI is used only to cross-check our own adjusted prices from December 2019, beca
 
 ## Rebuilding
 
-The bhavcopy and corporate-action files can be refetched with the NSE URLs in the nse-market-data skill; jt-pilot's downloader did the same in about an hour. The two index files and the T-bill file are rebuilt with `python -m frazzini_pedersen_india.data.index_downloader data/nse/indices 2026` and `python -m frazzini_pedersen_india.data.tbill_downloader data/nse/tbill_auctions.csv 63804 61400`.
+The bhavcopy and corporate-action files can be refetched with the NSE URLs in the nse-market-data skill; that study's downloader did the same in about an hour. The two index files and the T-bill file are rebuilt with `python -m frazzini_pedersen_india.data.index_downloader data/nse/indices 2026` and `python -m frazzini_pedersen_india.data.tbill_downloader data/nse/tbill_auctions.csv 63804 61400`.
