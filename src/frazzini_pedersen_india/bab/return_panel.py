@@ -66,11 +66,14 @@ class ReturnPanel:
         last = series.groupby(self.sessions.to_period('M')).max()
         return list(last)
 
-    def monthly_returns(self) -> pd.DataFrame:
+    def monthly_returns(
+        self, skip_first_session: bool = False
+    ) -> pd.DataFrame:
         """Compounds each share's daily returns within each month.
 
         Args:
-            None.
+            skip_first_session: If True, leaves out each month's first
+                session, as if trading waited one session after formation.
 
         Returns:
             A table with one row per month, labelled by period, and one
@@ -81,6 +84,10 @@ class ReturnPanel:
         """
         logs = np.log1p(self.daily_full)
         months = logs.index.to_period('M')
+        if skip_first_session:
+            first = ~pd.Series(months).duplicated().to_numpy()
+            logs = logs.loc[~first]
+            months = months[~first]
         summed = logs.groupby(months).sum(min_count=1)
         return np.expm1(summed)
 

@@ -100,3 +100,35 @@ class TestReturnPanel:
             pd.Timestamp('2020-01-31'),
             pd.Timestamp('2020-02-05'),
         ]
+
+    def test_skipping_first_session_drops_it_from_the_month(self) -> None:
+        """Waiting one session leaves out each month's first return.
+
+        Args:
+            None.
+
+        Returns:
+            None.
+
+        Raises:
+            AssertionError: If the monthly return is wrong.
+        """
+        sessions = pd.DatetimeIndex(
+            ['2020-01-30', '2020-01-31', '2020-02-03', '2020-02-04']
+        )
+        rows = []
+        for date, value in zip(sessions, (0.0, 0.1, 0.5, 0.1), strict=True):
+            rows.append(
+                {
+                    'date': date,
+                    'symbol': 'ABC',
+                    'return': value,
+                    'traded_value': 100.0,
+                }
+            )
+        panel = ReturnPanel(pd.DataFrame(rows), sessions)
+        monthly = panel.monthly_returns(skip_first_session=True)
+        assert monthly.loc['2020-01', 'ABC'] == pytest.approx(0.1)
+        assert monthly.loc['2020-02', 'ABC'] == pytest.approx(0.1)
+        full = panel.monthly_returns()
+        assert full.loc['2020-02', 'ABC'] == pytest.approx(1.5 * 1.1 - 1.0)

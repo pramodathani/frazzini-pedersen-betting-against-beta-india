@@ -130,3 +130,21 @@ class TestBetaEstimator:
         result = BetaEstimator().three_day_log_returns(daily)
         assert np.isnan(result[:5, 0]).all()
         assert result[5, 0] == pytest.approx(0.3)
+
+    def test_five_day_windows_sum_five_sessions(self) -> None:
+        """A five-day overlap sums five consecutive log returns.
+
+        Args:
+            None.
+
+        Returns:
+            None.
+
+        Raises:
+            AssertionError: If a sum is wrong.
+        """
+        daily = np.full((7, 1), 0.1)
+        result = BetaEstimator().overlapping_log_returns(daily, 5)
+        assert np.isnan(result[:4, 0]).all()
+        assert result[4, 0] == pytest.approx(0.5)
+        assert result[6, 0] == pytest.approx(0.5)

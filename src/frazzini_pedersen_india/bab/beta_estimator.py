@@ -18,6 +18,7 @@ class BetaEstimator:
         minimum_volatility_days: Fewest returns needed for volatility.
         minimum_correlation_days: Fewest three-day returns for correlation.
         shrinkage_weight: Weight on the share's own estimate.
+        overlap_days: Sessions summed in each overlapping return.
     """
 
     def __init__(
@@ -27,6 +28,7 @@ class BetaEstimator:
         minimum_volatility_days: int = 120,
         minimum_correlation_days: int = 750,
         shrinkage_weight: float = 0.6,
+        overlap_days: int = 3,
     ) -> None:
         """Stores the window lengths and the shrinkage weight.
 
@@ -36,6 +38,8 @@ class BetaEstimator:
             minimum_volatility_days: Fewest returns needed for volatility.
             minimum_correlation_days: Fewest three-day returns needed.
             shrinkage_weight: Weight on the share's own estimate.
+            overlap_days: Sessions summed in each overlapping return used
+                for the correlation; the paper uses three.
 
         Returns:
             None.
@@ -48,6 +52,7 @@ class BetaEstimator:
         self.minimum_volatility_days = minimum_volatility_days
         self.minimum_correlation_days = minimum_correlation_days
         self.shrinkage_weight = shrinkage_weight
+        self.overlap_days = overlap_days
 
     def three_day_log_returns(self, log_returns: np.ndarray) -> np.ndarray:
         """Sums log returns over three consecutive sessions.
@@ -63,8 +68,31 @@ class BetaEstimator:
         Raises:
             None.
         """
+        return self.overlapping_log_returns(log_returns, 3)
+
+    def overlapping_log_returns(
+        self, log_returns: np.ndarray, days: int
+    ) -> np.ndarray:
+        """Sums log returns over a number of consecutive sessions.
+
+        Args:
+            log_returns: Array of sessions by shares, with NaN where a share
+                has no clean return.
+            days: Number of sessions in each sum.
+
+        Returns:
+            An array of the same shape. Row t holds the sum of rows t-days+1
+            to t, and is NaN when any of them is NaN.
+
+        Raises:
+            None.
+        """
         result = np.full(log_returns.shape, np.nan)
-        result[2:] = log_returns[2:] + log_returns[1:-1] + log_returns[:-2]
+        total = np.zeros(log_returns[days - 1 :].shape)
+        for lag in range(days):
+            end = len(log_returns) - lag
+            total = total + log_returns[days - 1 - lag : end]
+        result[days - 1 :] = total
         return result
 
     def estimate(
@@ -93,8 +121,12 @@ class BetaEstimator:
         """
         stock_log = np.log1p(stock_returns.to_numpy(dtype=float))
         market_log = np.log1p(market_returns.to_numpy(dtype=float))
-        stock_three = self.three_day_log_returns(stock_log)
-        market_three = self.three_day_log_returns(market_log[:, None])[:, 0]
+        stock_three = self.overlapping_log_returns(
+            stock_log, self.overlap_days
+        )
+        market_three = self.overlapping_log_returns(
+            market_log[:, None], self.overlap_days
+        )[:, 0]
         betas = np.full((len(formation_dates), stock_log.shape[1]), np.nan)
         for row, date in enumerate(formation_dates):
             position = stock_returns.index.get_loc(date)
