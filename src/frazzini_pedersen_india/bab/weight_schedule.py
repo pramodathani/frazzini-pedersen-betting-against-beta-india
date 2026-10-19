@@ -11,15 +11,22 @@ class WeightSchedule:
     Attributes:
         liquid_count: How many of the most traded shares form the liquid
             universe.
+        minimum_value_quantile: Quantile of traded value below which shares
+            are left out.
         builder: The portfolio builder.
     """
 
-    def __init__(self, liquid_count: int = 500) -> None:
+    def __init__(
+        self, liquid_count: int = 500, minimum_value_quantile: float = 0.0
+    ) -> None:
         """Stores the size of the liquid universe.
 
         Args:
             liquid_count: Number of most traded shares in the liquid
                 universe.
+            minimum_value_quantile: Shares whose median traded value is
+                below this quantile of the eligible shares are left out; 0
+                keeps everything.
 
         Returns:
             None.
@@ -28,6 +35,7 @@ class WeightSchedule:
             None.
         """
         self.liquid_count = liquid_count
+        self.minimum_value_quantile = minimum_value_quantile
         self.builder = PortfolioBuilder()
 
     def liquid_flags(
@@ -85,6 +93,10 @@ class WeightSchedule:
             if traded is not None:
                 flags = traded.loc[date].reindex(eligible.index)
                 eligible = eligible[flags.fillna(False).astype(bool)]
+            if self.minimum_value_quantile > 0.0:
+                cut = median_value.loc[date].reindex(eligible.index)
+                cut_value = cut.quantile(self.minimum_value_quantile)
+                eligible = eligible[cut.fillna(0.0) >= cut_value]
             rows[date] = self.weights_at(eligible, median_value.loc[date])
         names = list(next(iter(rows.values())).keys())
         result = {}
